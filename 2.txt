@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Social We</title>
+    <style>
+        /* Reset & Basic Styling */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f5f7;
+            display: flex;
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .sidebar h2 {
+            font-size: 2rem;
+            margin-bottom: 40px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .sidebar a:hover {
+            background-color: #ff6f61;
+            transform: translateX(10px);
+        }
+
+        .sidebar .badge {
+            background-color: #ff6347;
+            padding: 4px 8px;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            margin-left: 5px;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            transform: rotate(180deg);
+        }
+
+        /* Content Styles */
+        .content {
+            flex: 1;
+            padding: 20px;
+            margin-left: 250px;
+            transition: margin-left 0.3s ease;
+            opacity: 0;
+            animation: fadeIn 0.8s forwards 0.5s;
+        }
+
+        .navbar {
+            background: #4caf50;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: slideInFromTop 0.5s ease-out;
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+        }
+
+        .navbar .search-bar {
+            position: relative;
+        }
+
+        .navbar .search-bar input {
+            width: 0;
+            height: 40px;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            transition: width 0.3s ease;
+            background: white;
+        }
+
+        .navbar .search-bar.active input {
+            width: 200px;
+        }
+
+        .navbar .search-bar button {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .navbar nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            color: #ff7e5f;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #4caf50;
+            min-width: 160px;
+            z-index: 1;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ff7e5f;
+        }
+
+        .profile-section, .post-box, .feed, .trending-section, .friend-suggestions {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: fadeIn 0.8s forwards;
+            transform: translateY(20px);
+            animation-delay: 0.5s;
+        }
+
+        .profile-section img {
+            border-radius: 50%;
+            width: 90px;
+            height: 90px;
+            margin-right: 20px;
+            border: 3px solid #4caf50;
+        }
+
+        .post-box textarea {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .post-box textarea:focus {
+            border-color: #4caf50;
+            outline: none;
+        }
+
+        .post-box button {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .post-box button:hover {
+            background-color: #45a049;
+        }
+
+        .like-button {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .like-button.liked {
+            transform: scale(1.2);
+            color: #ff6347;
+        }
+
+        /* Keyframe Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInFromTop {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 220px;
+            }
+            .content {
+                margin-left: 220px;
+            }
+
+            .navbar .search-bar.active input {
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <a href="#">🏠 Home</a>
+        <a href="#">💬 Messages <span class="badge">5</span></a>
+        <a href="#">🔔 Notifications <span class="badge">3</span></a>
+        <a href="#">👤 Profile</a>
+        <a href="#">⚙️ Settings</a>
+        <button class="sidebar-toggle">≡</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content">
+        <div class="navbar">
+            <h1>chatterbox</h1>
+            <div class="search-bar">
+                <button onclick="toggleSearch()">🔍</button>
+                <input type="text" placeholder="Search...">
+            </div>
+            <nav>
+                <a href="#">Profile</a>
+                <a href="#">Feed</a>
+                <a href="#">Trending</a>
+                <div class="dropdown">
+                    <a href="#">Account</a>
+                    <div class="dropdown-content">
+                        <a href="#">Settings</a>
+                        <a href="#">Logout</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <div class="profile-section">
+            <img src="https://via.placeholder.com/90" alt="Profile" />
+            <div class="profile-info">
+                <h2>John Doe</h2>
+                <p><strong>Status:</strong> Online</p>
+            </div>
+        </div>
+
+        <div class="post-box">
+            <textarea placeholder="What's on your mind?"></textarea>
+            <button>Post</button>
+        </div>
+
+        <div class="feed">
+            <h2>News Feed</h2>
+            <div class="post">
+                <strong>Alice</strong><br>
+                <small>2 hours ago</small>
+                <p>Enjoying a sunny day!</p>
+                <div class="post-actions">
+                    <button class="like-button" onclick="toggleLike(this)">👍</button>
+                    <button>Comment</button>
+                    <button>Share</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Social Web | <a href="#">About</a> | <a href="#">Help</a> | <a href="#">Privacy</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // Sidebar Toggle Function
+        document.querySelector('.sidebar-toggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+            document.querySelector('.content').style.marginLeft = document.querySelector('.sidebar').classList.contains('collapsed') ? '60px' : '250px';
+        });
+
+        // Search Bar Toggle
+        function toggleSearch() {
+            document.querySelector('.navbar .search-bar').classList.toggle('active');
+        }
+
+        // Like Button Toggle
+        function toggleLike(button) {
+            button.classList.toggle('liked');
+        }
+    </script>
+</body>
+</html>
